@@ -180,7 +180,8 @@ function tableData(columns, matrix, el) {
       colheads += `<th id="${i}">${v}</th>`;
     }
   })
-  let head = `<thead><tr>${colheads}</tr></thead>`;
+  let syrow = el.id !== '' ?  `<tr><th colspan="${useCols.length}">${el.id.toLocaleUpperCase()}</th></tr>` : '';
+  let head = `<thead>${syrow}<tr>${colheads}</tr></thead>`;
 
   let rows = [];
   matrix.forEach((v,i) => {
