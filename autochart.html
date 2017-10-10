@@ -1,0 +1,173 @@
+<html>
+  <head>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.2/vega.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.0-rc3/vega-lite.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-beta.20/vega-embed.js"></script>
+      <script src="codes.js"></script>
+      <script src="fetch.js"></script>
+      <style>
+      body {
+        background-color:aliceblue;
+        color:rgb(33,44,66);
+      }
+      * {
+        background-color:transparent;
+        font-family:Helvetica, Consolas, sans-serif;
+      }
+    </style>
+          <style>
+            hr {width:80%}
+            #toolbox {
+              position:absolute;
+              left: 0px;
+              top:0px;
+              width: 200px;
+              background-color:palegoldenrod;
+              color:darkslategray;
+              border-radius:0 0 5px 0 ;
+    
+              font-family:Helvetica, Consolas, sans-serif;
+              font-size:1em;
+            }
+    
+            #toolbox-inner {
+              position:relative;
+            }
+    
+            #content{
+              position:absolute;
+              left:200px;
+              right:0px;
+              top:50%;
+              height:50%;
+              background-color:transparent;
+              display:flex;
+              flex-direction:row;
+              flex-wrap:wrap;
+              overflow-x:hidden;
+              overflow-y:auto;
+            }
+    
+            #content > * {
+              position: relative;
+            }
+    
+            #toolbuttons {
+              margin:1px;
+              padding:1px;
+            }
+    
+            #symbol {
+              max-width: 200px;
+              overflow: hidden;
+            }
+
+            td {
+              font-size:.8em;
+              padding: 0 1em 0 1em;
+              text-align:right;
+            }
+
+            th {
+              text-align:center;
+              margin:1em;
+            }
+
+            .unused {
+              color:white;
+              background-color:slategray;
+            }
+
+            #visbox { 
+              position: absolute;
+              left: 200px;
+              right:0;
+              top:0;
+              height:50%;
+              
+              overflow:hidden;
+            }
+        </style>
+
+        <style>
+          #datebox {
+            position:relative;
+            width:180px;
+            height:33px;
+            margin: 0 10px 0 10px;
+          }
+          #datebox > * {
+            position:absolute;
+            user-select:none;
+
+          }
+          #datebox > * > * {
+            position:relative;
+          }
+          #datebox-back {
+            left:0;
+            top:7px;
+            cursor:pointer;
+          }
+          #datebox-next {
+            right: 0;
+            top:7px;
+            cursor:pointer;
+          }
+          #datebox-up {
+            top:0;
+            left:85px;
+            cursor:pointer;
+          }
+          #datebox-down {
+            bottom:0;
+            right:88px;
+            font-size:.8em;
+            cursor:pointer;
+          }
+          #datebox-date {
+            top:10px;
+            left: 15px;
+            width:150px;
+            text-align:center;
+            font-size:.66em;
+            font-weight:bold;
+            cursor:default;
+          }
+        </style>
+
+        </head>
+      
+        <body>
+          <div id="toolbox">
+            <div id="toolbox-inner">
+              <div id="toolbuttons">
+                <div id="symbol" nowrap contenteditable>AAPL</div>
+              </div>
+              <hr/>
+              <div id="datebox">
+                <div id="datebox-up">^</div>
+                <div id="datebox-back">&lt;</div>
+                <div id="datebox-date">June 2017</div>
+                <div id="datebox-next">&gt;</div>
+                <div id="datebox-down">v</div>
+              </div>
+              <hr/>
+              <div id="colopts">
+              </div>
+              <hr/>
+              <div id="chartopts">
+              </div>
+            </div>
+          
+          </div>
+    
+          <div id="visbox">
+          </div>
+          <div id="content">
+          </div>
+
+  </body>
+  <script src="toolbox.js"></script>
+ 
+</html>
