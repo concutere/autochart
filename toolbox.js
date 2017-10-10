@@ -106,13 +106,14 @@ function getSymbols(systr) {
 }
 
 function splitFetch(systr) {
-  let already = clearExcept(systr);
+  //let already = clearExcept(systr);
+  clearContent();
   let symbols = getSymbols(systr);
   symbols.sort();
   //console.log(symbols);
   let colorscale = getColorScale(symbols.length);
   symbols.forEach((s,i) => {
-    if (already.indexOf(s) === -1) {
+    //if (already.indexOf(s) === -1) {
       getData(s, dateStart(), dateEnd(), (d) => {
         let content = document.getElementById('content');
         let table = document.createElement('table');
@@ -139,10 +140,10 @@ function splitFetch(systr) {
           visData(symbols);
         }
       });
-    }
+    /*}
     else {
       document.getElementById(s).style.backgroundColor = colorscale[i];
-    }
+    }*/
   });
 
   return true;
