@@ -4,6 +4,8 @@ const maxSymbolLen = 5; //TODO better symbol tokenizing
 let _monthStart = '2017-06';
 let _monthSpan = 1;
 var lastSymbol;
+var useSmoothing = false;
+var useLogScale = false;
 
 document.getElementById('symbol').addEventListener('keyup', checkSymbol);
 document.getElementById('symbol').addEventListener('keydown', (e) => {
@@ -132,13 +134,17 @@ function splitFetch(systr) {
               if(useCols.indexOf(i) === -1) {
                 el.className = 'unused';
               }
+              else {
+                el.className = 'used';
+                el.innerHTML += `<div width="*" style="position:absolute;top:4;right:1;text-align:right;font-style:italic; font-size:.66em;">field type</div>`;
+              }
               colopts.appendChild(el);
             });
           }
         }
-        if(content.children.length === symbols.length) {
+        //if(content.children.length === symbols.length) {
           visData(symbols);
-        }
+        //}
       });
     /*}
     else {
@@ -159,7 +165,7 @@ function toggleUsed(i) {
   if (idx === -1) {
     useCols.push(i);
     useCols.sort((a,b) => {return a > b;});
-    document.getElementById(`colopt${i}`).className = '';
+    document.getElementById(`colopt${i}`).className = 'used';
     //console.log(`using ${i}`)
   }
   else {
@@ -209,18 +215,86 @@ function visData(symbols) {
   }
   let dataValues = [];
   let colNames;
+  var calcName='';
   
   symbols.forEach((symbol) => {
+    //TODO use localForage or ??? instead of a simple in-memory array ...
     let dataset = fetched[getQuery(symbol,dateStart(),dateEnd())];
+    if (!dataset) {
+      return;
+    }
     colNames = dataset.column_names;
     let data = dataset.data;
-    data.forEach((row) => {
-      let values = {'Symbol':symbol};
-      useCols.forEach((c) => {
-        values[colNames[c].replace('.','').replace(' ','')] = row[c];
+
+    let valCols = useCols.slice(1);
+    calcName = valCols.map((vc) => colNames[vc].replace('.','').replace(' ',''))
+                    .reduce((name,part) => `${name}*${part}`);
+    var calcVals = data.map((row) => 
+                    valCols.map((vc) => row[vc])
+                      .reduce((acc,n) => acc+n)
+    );
+
+    if (useLogScale) {
+      calcVals = calcVals.map((v) => Math.log(v));
+    }
+    if (useSmoothing) {
+      var smoothWith = [];
+      var smoothMax = 3;
+      if(_monthSpan > 1 && _monthSpan < 6) {
+        smoothMax = 7;
+      }
+      else if(_monthSpan >= 6) {
+        smoothMax = 21;
+      }
+      calcVals = calcVals.map((v,vi) => {
+        if (smoothWith.length == smoothMax) {
+          smoothWith = smoothWith.slice(1);
+        }
+        smoothWith.push(v);
+
+        if(smoothWith.length > 1) {
+          return smoothWith.reduce((acc,n) => acc+n) / smoothWith.length;
+        }
+        else {
+          return v;
+        }
+      });
+    }
+    
+    calcVals.forEach((v,rid) => {
+              let values = {'Symbol':symbol, 'Date':data[rid][useCols[0]]};
+              values[calcName] = v;
+              dataValues.push(values);
+            });
+
+    
+    /*data.forEach((row, rid) => {
+      let values = {'Symbol':symbol, 'Date':row[useCols[0]]};
+      let calcVal = valCols.map((vc) => row[vc])
+                      .reduce((total,colVal) => total + colVal);
+      
+      if(useLogScale===True) {
+        calcVal = Math.log(v);
+      }
+      values[calcName] = calcVal;
+      /*valCols.forEach((c) => {
+        let v = row[c];
+        //TODO only tweak output value for combined (x-in-chart) term
+        // OR ... TODO per-field log/smooth or combine options?
+        if(useLogScale===true) {
+          v = Math.log(v);
+        }
+        if(useSmoothing && rid > 0) {
+          let smoothWith = data.slice(Math.max(0,rid-3),Math.max(0,rid)).map((rr) => rr[c]);
+          if (smoothWith.length > 0) {
+            v = (v + smoothWith.reduce((acc,n) => acc+n)
+              ) / (smoothWith.length + 1);
+          }
+        }
+        values[colNames[c].replace('.','').replace(' ','')] = v;
       });
       dataValues.push(values);
-    });
+    });*/
   });
 
   if(useCols.length > 1) {
@@ -257,11 +331,10 @@ function visData(symbols) {
       "data": {
         "values": dataValues
       },
-      "transform": transforms,
       "mark": "line",
       "encoding": {
         "x": {"field": "Date", "type": "temporal", "axis": {"grid":false}},
-        "y": {"field": yField, "type": "quantitative", "axis": {"grid":false}},
+        "y": {"field": calcName, "type": "quantitative", "axis": {"grid":false}},
         "color": {"field": "Symbol", "type": "nominal","scale":{"range":colorscale}}
       }
     };
@@ -324,25 +397,18 @@ return new Hsl(
 ////////////////////////////////////////////
 
 function dateboxEventInit() {
-  let datebox = document.getElementById('datebox');
-  datebox.addEventListener('click', (e) => {
-    console.log(e);
-    switch(e.target.id) {
-      case 'datebox-back':
-        dateBack();
-        break;
-      case 'datebox-next':
-        dateNext();
-        break;
-      case 'datebox-up':
-        dateUp();
-        break;
-      case 'datebox-down':
-        dateDown();
-        break;
-    }
-    return false;
-  })
+  document.getElementById('datebox-back').addEventListener('click', (e) => {
+    dateBack();
+  });
+  document.getElementById('datebox-next').addEventListener('click', (e) => {
+    dateNext();
+  });
+  document.getElementById('datebox-up').addEventListener('click', (e) => {
+    dateUp();
+  });
+  document.getElementById('datebox-down').addEventListener('click', (e) => {
+    dateDown();
+  });
 }
 
 function dateStart() {
@@ -436,4 +502,40 @@ function redate() {
   refetch();
 }
 
+
+/////////////////////////////////////
+
+
+function chartOptsEventInit() {
+  let chartopts = document.getElementById('chartopts');
+  chartopts.childNodes.forEach((n,i) => {
+    n.addEventListener('click', (e) => {
+      console.log(e);
+      switch(e.target.id) {
+        case 'smooth':
+          useSmoothing = !useSmoothing;
+          break;
+        case 'log':
+          useLogScale = !useLogScale;
+          break;
+      }
+      let tt = e.target.classList.toggle('on');
+      visData();
+      return false;      
+    })
+
+  })
+}
+
+function smooth() {
+
+}
+
+function log() {
+
+}
+
+/////////////////////////////////////
 dateboxEventInit();
+chartOptsEventInit();
+refetch();

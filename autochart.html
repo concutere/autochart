@@ -78,6 +78,20 @@
               background-color:slategray;
             }
 
+            .used {
+              position:relative;
+              border:1px dotted black;
+              border-radius:5px;
+            }
+
+            .unused > div {
+              visibility: collapse;
+            }
+
+            #colopts > div {
+              margin: 0 5px 0 5px;
+            }
+
             #visbox { 
               position: absolute;
               left: 200px;
@@ -92,12 +106,14 @@
         <style>
           #datebox {
             position:relative;
-            width:180px;
+            display:grid;
+            grid-template-columns: auto 150px auto;
+            grid-template-rows: 10px 15px 10px;
+            width:170px;
             height:33px;
-            margin: 0 10px 0 10px;
+            margin: 0 15px 0 15px;
           }
           #datebox > * {
-            position:absolute;
             user-select:none;
 
           }
@@ -105,34 +121,74 @@
             position:relative;
           }
           #datebox-back {
-            left:0;
-            top:7px;
+            grid-row:2;
+            grid-column:1;
             cursor:pointer;
           }
           #datebox-next {
-            right: 0;
-            top:7px;
+            grid-row:2;
+            grid-column:3;
             cursor:pointer;
           }
           #datebox-up {
-            top:0;
-            left:85px;
+            grid-row:1;
+            grid-column:2;
             cursor:pointer;
           }
           #datebox-down {
-            bottom:0;
-            right:88px;
+            grid-row:3;
+            grid-column:2;
             font-size:.8em;
             cursor:pointer;
           }
           #datebox-date {
-            top:10px;
-            left: 15px;
+            grid-row:2;
+            grid-column:2;
+
             width:150px;
             text-align:center;
             font-size:.66em;
             font-weight:bold;
             cursor:default;
+            
+          }
+
+          #datebox > div > svg > polyline {
+            stroke: rgba(0,0,0,.5);
+            fill:transparent;
+          }
+          #datebox > div > svg > polyline:hover {
+            fill:whitesmoke;
+          }
+          #datebox > div > svg > polyline:active {
+            fill:goldenrod;
+          }
+        </style>
+
+        <style>
+          #chartopts {
+            display:grid;
+            grid-auto-columns:auto;
+            padding:5px
+          }
+          #chartopts > div {
+            padding:5px;
+            text-align:center;
+            font-size:.8em;
+            font-weight:bold;
+            box-shadow: inset 0 0 5px -1px black, 0 0 2px black;
+            margin:2px;
+            border-radius:2px;
+          }
+
+          #chartopts > div:active {
+            box-shadow: inset 0 0 5px  orangered, 0 0 2px black;
+          }
+
+          #chartopts > .on {
+            color:orangered;
+            text-shadow: 0 0 1em orangered;
+            box-shadow: inset 0 0 5px -1px orangered, 0 0 2px black;
           }
         </style>
 
@@ -142,21 +198,23 @@
           <div id="toolbox">
             <div id="toolbox-inner">
               <div id="toolbuttons">
-                <div id="symbol" nowrap contenteditable>AAPL</div>
+                <div id="symbol" nowrap contenteditable>AAPL AMZN GOOG MSFT</div>
               </div>
               <hr/>
               <div id="datebox">
-                <div id="datebox-up">^</div>
-                <div id="datebox-back">&lt;</div>
+                <div id="datebox-up"><svg width="150" height="10"><polyline points="1,9 75,1 149,9" /></svg></div>
+                <div id="datebox-back"><svg width="10" height="15"><polyline points="9,14 5,8 9,1" /></svg></div>
                 <div id="datebox-date">June 2017</div>
-                <div id="datebox-next">&gt;</div>
-                <div id="datebox-down">v</div>
-              </div>
-              <hr/>
-              <div id="colopts">
+                <div id="datebox-next"><svg width="10" height="15"><polyline points="1,14 4,8 1,1" /></svg></div>
+                <div id="datebox-down"><svg width="150" height="10"><polyline points="1,1 75,9 149,1"/></svg></div>
               </div>
               <hr/>
               <div id="chartopts">
+                <div id="smooth">smooth</div>
+                <div id="log">log</div>
+              </div>
+              <hr/>
+              <div id="colopts">
               </div>
             </div>
           
