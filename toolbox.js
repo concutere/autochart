@@ -6,6 +6,7 @@ let _monthSpan = 1;
 var lastSymbol;
 var useSmoothing = false;
 var useLogScale = false;
+var useIndex = false;
 
 document.getElementById('symbol').addEventListener('keyup', checkSymbol);
 document.getElementById('symbol').addEventListener('keydown', (e) => {
@@ -231,13 +232,13 @@ function visData(symbols) {
                     .reduce((name,part) => `${name}*${part}`);
     var calcVals = data.map((row) => 
                     valCols.map((vc) => row[vc])
-                      .reduce((acc,n) => acc+n)
+                      .reduce((acc,n) => acc*n)
     );
 
-    if (useLogScale) {
+    if (useLogScale===true) {
       calcVals = calcVals.map((v) => Math.log(v));
     }
-    if (useSmoothing) {
+    if (useSmoothing===true) {
       var smoothWith = [];
       var smoothMax = 3;
       if(_monthSpan > 1 && _monthSpan < 6) {
@@ -259,6 +260,14 @@ function visData(symbols) {
           return v;
         }
       });
+    }
+
+    if (useIndex===true) {
+      let idxVals = calcVals.map((v,i,a) => (v/a[0])*100); 
+      //TODO better derived field differentiation ...
+      console.log(calcVals);
+      console.log(idxVals);
+      calcVals = idxVals;
     }
     
     calcVals.forEach((v,rid) => {
@@ -518,6 +527,8 @@ function chartOptsEventInit() {
         case 'log':
           useLogScale = !useLogScale;
           break;
+        case 'index':
+          useIndex = !useIndex;
       }
       let tt = e.target.classList.toggle('on');
       visData();
