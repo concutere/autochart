@@ -239,36 +239,14 @@ function visData(symbols) {
       calcVals = calcVals.map((v) => Math.log(v));
     }
     if (useSmoothing===true) {
-      var smoothWith = [];
-      var smoothMax = 3;
-      if(_monthSpan > 1 && _monthSpan < 6) {
-        smoothMax = 7;
-      }
-      else if(_monthSpan >= 6) {
-        smoothMax = 21;
-      }
-      calcVals = calcVals.map((v,vi) => {
-        if (smoothWith.length == smoothMax) {
-          smoothWith = smoothWith.slice(1);
-        }
-        smoothWith.push(v);
-
-        if(smoothWith.length > 1) {
-          return smoothWith.reduce((acc,n) => acc+n) / smoothWith.length;
-        }
-        else {
-          return v;
-        }
-      });
+      calcVals = Uji.smooth(calcVals);
     }
 
     if (useIndex===true) {
-      let idxVals = calcVals.map((v,i,a) => (v/a[0])*100); 
-      //TODO better derived field differentiation ...
-      console.log(calcVals);
-      console.log(idxVals);
+      //TODO list is in reverse order, index should be from i=0  not i=length
+      let idxVals = calcVals.map((v,i,a) => (v/a[a.length-1])*100); 
       calcVals = idxVals;
-    }
+    }    
     
     calcVals.forEach((v,rid) => {
               let values = {'Symbol':symbol, 'Date':data[rid][useCols[0]]};
@@ -308,7 +286,7 @@ function visData(symbols) {
 
   if(useCols.length > 1) {
     //assume date, use next avail for Y
-    let yField = colNames[useCols[1]].replace('.','').replace(' ','');
+    /*let yField = colNames[useCols[1]].replace('.','').replace(' ','');
     let transforms = [];
     if (useCols.length >= 3) {
       let zFields = useCols.slice(2).map((c) => { return colNames[c].replace('.','').replace(' ',''); });
@@ -320,10 +298,10 @@ function visData(symbols) {
           return `${acc} * datum.${field}`;
         }
       });*/
-      let asField = `${yField}*${zFields.join('*')}`;
+      /*let asField = `${yField}*${zFields.join('*')}`;
       transforms.push({"calculate":calcField, "as": asField});
       yField = asField;
-    }
+  }*/
 
     let colorscale = getColorScale(symbols.length);
     
