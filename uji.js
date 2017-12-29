@@ -99,6 +99,15 @@ class Uji {
       }
     });
   }
+
+  static log(calcVals) {
+    return calcVals.map((v) => Math.log(v));
+  }
+
+  static index(calcVals) {
+    //TODO divide by a[a.length] or a[0]?
+    return calcVals.map((v,i,a) => (v/a[a.length-1])*100); 
+  }
     
 }
 
