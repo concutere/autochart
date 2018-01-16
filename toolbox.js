@@ -236,15 +236,16 @@ function visData(symbols) {
     );
 
     if (useLogScale===true) {
-      calcVals = Uji.log(calcVals);
+      calcVals = calcVals.map((v) => Math.log(v));
     }
     if (useSmoothing===true) {
       calcVals = Uji.smooth(calcVals);
     }
 
     if (useIndex===true) {
-      //TODO how to know when list is in reverse order? defer to some stat encapsulated as an Uji object?
-      calcVals = Uji.index(calcVals);
+      //TODO list is in reverse order, index should be from i=0  not i=length
+      let idxVals = calcVals.map((v,i,a) => (v/a[a.length-1])*100); 
+      calcVals = idxVals;
     }    
     
     calcVals.forEach((v,rid) => {

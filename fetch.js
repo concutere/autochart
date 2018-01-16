@@ -15,7 +15,7 @@ function getQuery(symbol,start,end) {
 
 async function getData(symbol,start,end,nextFn) {
   let query = getQuery(symbol, start, end);
-  let url = `https://www.quandl.com/api/v3/datasets/WIKI/${query}&api_key=${codes['quandl']}&sort_order=asc&exclude_headers=true&collapse=daily`;
+  let url = `https://www.quandl.com/api/v3/datasets/WIKI/${query}&api_key=${codes['quandl']}&sort_order=desc&exclude_headers=true&collapse=daily`;
 
   if (query in fetched) {
     if(typeof(nextFn) === 'function') {
