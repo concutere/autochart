@@ -99,7 +99,51 @@ class Uji {
       }
     });
   }
-    
+
+  static log(calcVals) {
+    return calcVals.map((v) => Math.log(v));
+  }
+
+  static index(calcVals) {
+    return calcVals.map((v,i,a) => (v/a[a.length-1])*100); //TODO why is array sorted backwards here? clearer to fix elsewhere and use a[0] here ...
+  }
+
+  //////////////////////////////////////
+
+  static combine(cols, data) {
+    return data.map((row) => 
+            cols.map((vc) => row[vc])
+              .reduce((acc,n) => acc*n)
+    );
+  }
+
+  static flatten(vals) {
+    if(this.stack) {
+      this.stack.forEach((transform,i) => {
+        vals = transform(vals);
+      });
+    }
+    return vals;
+  }
+
+  static flattenStack(cols, data) {
+    return Uji.flatten(Uji.combine(cols, data));
+  }
+
+  static stackOn(transform) {
+    if(!this.stack) {
+      this.stack=[transform];
+    }
+    else if (!this.stack.includes(transform)) {
+      this.stack.push(transform);
+    }
+  }
+
+  static stackOff(transform) {
+    if(this.stack && this.stack.includes(transform)) {
+      this.stack.splice(this.stack.indexOf(transform),1);
+    }
+  }
 }
 
 //export default Uji;

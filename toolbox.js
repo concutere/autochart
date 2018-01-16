@@ -228,26 +228,28 @@ function visData(symbols) {
     let data = dataset.data;
 
     let valCols = useCols.slice(1);
+    //TODO combining fields should be a first-step transform ...
     calcName = valCols.map((vc) => colNames[vc].replace('.','').replace(' ',''))
                     .reduce((name,part) => `${name}*${part}`);
-    var calcVals = data.map((row) => 
+    var calcVals = Uji.flattenStack(valCols, data); /*data.map((row) => 
                     valCols.map((vc) => row[vc])
                       .reduce((acc,n) => acc*n)
-    );
+    );*/
 
-    if (useLogScale===true) {
-      calcVals = calcVals.map((v) => Math.log(v));
+    //TODO? cache data transforms ?
+
+    /*if (useLogScale===true) {
+      calcVals = Uji.log(calcVals);
     }
     if (useSmoothing===true) {
       calcVals = Uji.smooth(calcVals);
     }
 
     if (useIndex===true) {
-      //TODO list is in reverse order, index should be from i=0  not i=length
-      let idxVals = calcVals.map((v,i,a) => (v/a[a.length-1])*100); 
-      calcVals = idxVals;
-    }    
+      calcVals = Uji.index(calcVals);
+    } */  
     
+    //formatting dataValues for vega-lite
     calcVals.forEach((v,rid) => {
               let values = {'Symbol':symbol, 'Date':data[rid][useCols[0]]};
               values[calcName] = v;
@@ -501,13 +503,18 @@ function chartOptsEventInit() {
       switch(e.target.id) {
         case 'smooth':
           useSmoothing = !useSmoothing;
+          toggleStack(useSmoothing, Uji.smooth);
           break;
         case 'log':
           useLogScale = !useLogScale;
+          toggleStack(useLogScale, Uji.log);
           break;
         case 'index':
           useIndex = !useIndex;
+          toggleStack(useIndex, Uji.index);
+          break;
       }
+
       let tt = e.target.classList.toggle('on');
       visData();
       return false;      
@@ -516,12 +523,26 @@ function chartOptsEventInit() {
   })
 }
 
-function smooth() {
+function toggleStack(isOn,transform) {
+  if(isOn) {
+    Uji.stackOn(transform);
+  }
+  else {
+    Uji.stackOff(transform);
+  }
 
+  viewStack(Uji.stack);
 }
 
-function log() {
-
+function viewStack(stack) {
+  let stackbox = document.getElementById('stackbox');
+  stackbox.innerText = '';
+  stack.forEach((v) => {
+    let el = document.createElement('div');
+    el.id = v.name;
+    el.innerText = v.name;
+    stackbox.appendChild(el);
+  });
 }
 
 /////////////////////////////////////
