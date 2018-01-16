@@ -224,6 +224,9 @@ function visData(symbols) {
     if (!dataset) {
       return;
     }
+    else {
+      //console.log(dataset);
+    }
     colNames = dataset.column_names;
     let data = dataset.data;
 

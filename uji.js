@@ -105,7 +105,7 @@ class Uji {
   }
 
   static index(calcVals) {
-    return calcVals.map((v,i,a) => (v/a[a.length-1])*100); //TODO why is array sorted backwards here? clearer to fix elsewhere and use a[0] here ...
+    return calcVals.map((v,i,a) => (v/a[0])*100); //TODO why is array sorted backwards here? clearer to fix elsewhere and use a[0] here ...
   }
 
   //////////////////////////////////////
